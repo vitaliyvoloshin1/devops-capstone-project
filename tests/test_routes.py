@@ -186,3 +186,16 @@ class TestAccountService(TestCase):
         # Проверяем, что аккаунта больше нет
         resp = self.client.get(f"{BASE_URL}/{new_account_id}")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    def test_list_all_accounts(self):
+        """It should List all Accounts"""
+        # Создаем несколько тестовых аккаунтов
+        self._create_accounts(3)
+
+        # Запрашиваем список всех аккаунтов
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Проверяем, что список не пустой
+        data = resp.get_json()
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(data), 3)  # Убедимся, что получили 3 аккаунта
