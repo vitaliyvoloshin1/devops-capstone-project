@@ -62,6 +62,8 @@ def create_accounts():
 ######################################################################
 
 # ... place you code here to LIST accounts ...
+
+
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
     """
@@ -142,16 +144,15 @@ def update_account(account_id):
     # ✅ Теперь вызываем `update()`, а не `save()`
     account.update()
     app.logger.info(f"Updated account: {account.serialize()}")
-
     return account.serialize(), status.HTTP_200_OK
-
-
 
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
 
 # ... place you code here to DELETE an account ...
+
+
 @app.route("/accounts/<int:account_id>", methods=["DELETE"])
 def delete_account(account_id):
     """
