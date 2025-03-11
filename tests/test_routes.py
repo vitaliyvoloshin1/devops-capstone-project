@@ -141,3 +141,48 @@ class TestAccountService(TestCase):
         # Проверяем, что данные совпадают
         data = resp.get_json()
         self.assertEqual(data["name"], test_account.name)
+    def test_update_an_account(self):
+        """It should Update an Account"""
+        # Создаем новый аккаунт
+        test_account = AccountFactory()
+        resp = self.client.post(BASE_URL, json=test_account.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Получаем ID созданного аккаунта
+        new_account_id = resp.get_json()["id"]
+
+        # Обновляем данные аккаунта
+        updated_data = {"name": "Updated Name", "email": "updated@example.com"}
+        resp = self.client.put(
+            f"{BASE_URL}/{new_account_id}",
+            json=updated_data,
+            content_type="application/json"  # <-- Добавляем этот заголовок
+        )
+
+        
+        # Проверяем, что статус HTTP_200_OK
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Проверяем, что обновленные данные сохранены
+        updated_resp = self.client.get(f"{BASE_URL}/{new_account_id}")
+        self.assertEqual(updated_resp.status_code, status.HTTP_200_OK)
+        data = updated_resp.get_json()
+        self.assertEqual(data["name"], "Updated Name")
+        self.assertEqual(data["email"], "updated@example.com")
+    def test_delete_an_account(self):
+        """It should Delete an Account"""
+        # Создаем тестовый аккаунт
+        test_account = AccountFactory()
+        resp = self.client.post(BASE_URL, json=test_account.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Получаем ID созданного аккаунта
+        new_account_id = resp.get_json()["id"]
+
+        # Удаляем аккаунт
+        resp = self.client.delete(f"{BASE_URL}/{new_account_id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Проверяем, что аккаунта больше нет
+        resp = self.client.get(f"{BASE_URL}/{new_account_id}")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
