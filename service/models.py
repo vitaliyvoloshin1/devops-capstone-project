@@ -33,23 +33,24 @@ class PersistentBase:
 
     def create(self):
         """
-        Creates a Account to the database
+        Creates an Account in the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info("Creating account: %s", self.name)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
     def update(self):
         """
-        Updates a Account to the database
+        Updates an Account in the database
         """
-        logger.info("Updating %s", self.name)
+        logger.info("Updating account: %s", self.name)  # ✅ Исправлено
+        db.session.add(self)  # ✅ Добавлено, чтобы изменения сохранялись
         db.session.commit()
 
     def delete(self):
-        """Removes a Account from the data store"""
-        logger.info("Deleting %s", self.name)
+        """Removes an Account from the data store"""
+        logger.info("Deleting account: %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
@@ -71,7 +72,7 @@ class PersistentBase:
 
     @classmethod
     def find(cls, by_id):
-        """Finds a record by it's ID"""
+        """Finds a record by its ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
@@ -98,7 +99,7 @@ class Account(db.Model, PersistentBase):
         return f"<Account {self.name} id=[{self.id}]>"
 
     def serialize(self):
-        """Serializes a Account into a dictionary"""
+        """Serializes an Account into a dictionary"""
         return {
             "id": self.id,
             "name": self.name,
@@ -110,7 +111,7 @@ class Account(db.Model, PersistentBase):
 
     def deserialize(self, data):
         """
-        Deserializes a Account from a dictionary
+        Deserializes an Account from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
@@ -143,3 +144,4 @@ class Account(db.Model, PersistentBase):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+      
