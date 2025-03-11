@@ -42,7 +42,7 @@ def index():
 def create_accounts():
     """
     Creates an Account
-    This endpoint will create an Account based the data in the body that is posted
+    This endpoint will create an Account based on the data in the body that is posted
     """
     app.logger.info("Request to create an Account")
     check_content_type("application/json")
@@ -67,8 +67,6 @@ def create_accounts():
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
-
-# ... place you code here to READ an account ...
 @app.route("/accounts/<int:account_id>", methods=["GET"])
 def get_account(account_id):
     """
@@ -88,8 +86,52 @@ def get_account(account_id):
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
+@app.route("/accounts/<int:account_id>", methods=["PUT"])
+def update_account(account_id):
+    """
+    Update an Account
+    This endpoint will update an existing Account
+    """
+    app.logger.info("Request to update Account with id: %s", account_id)
 
-# ... place you code here to UPDATE an account ...
+    # Проверяем, существует ли аккаунт
+    account = Account.find(account_id)
+    if not account:
+        app.logger.error(f"Account with id {account_id} not found.")
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id [{account_id}] not found.")
+
+    # Проверяем Content-Type
+    check_content_type("application/json")
+
+    # Получаем данные из запроса
+    account_data = request.get_json()
+
+    # Логируем входные данные
+    app.logger.info(f"Received JSON payload for update: {account_data}")
+
+    # Проверяем, что данные переданы
+    if not account_data or not isinstance(account_data, dict):
+        app.logger.error("Invalid JSON data provided.")
+        abort(status.HTTP_400_BAD_REQUEST, "Invalid JSON data provided")
+
+    # Проверяем, содержит ли `account_data` хотя бы одно поле для обновления
+    valid_fields = ["name", "email", "address", "phone_number", "date_joined"]
+    if not any(key in account_data for key in valid_fields):
+        app.logger.error("No valid fields provided for update.")
+        abort(status.HTTP_400_BAD_REQUEST, "No valid fields provided for update")
+
+    # Обновляем поля
+    for key in valid_fields:
+        if key in account_data:
+            setattr(account, key, account_data[key])
+            app.logger.info(f"Updating {key}: {account_data[key]}")
+
+    # ✅ Теперь вызываем `update()`, а не `save()`
+    account.update()
+    app.logger.info(f"Updated account: {account.serialize()}")
+
+    return account.serialize(), status.HTTP_200_OK
+
 
 
 ######################################################################
@@ -102,8 +144,6 @@ def get_account(account_id):
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
-
-
 def check_content_type(media_type):
     """Checks that the media type is correct"""
     content_type = request.headers.get("Content-Type")
@@ -114,4 +154,3 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {media_type}",
     )
-    
