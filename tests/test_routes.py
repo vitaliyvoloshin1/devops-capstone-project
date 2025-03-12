@@ -217,3 +217,21 @@ class TestAccountService(TestCase):
 
         self.assertIn("Referrer-Policy", response.headers)
         self.assertEqual(response.headers["Referrer-Policy"], "strict-origin-when-cross-origin")
+    def test_security_headers(self):
+        """It should return security headers"""
+        # Убедитесь, что URL правильный (например, "/" или ваш фактический root URL)
+        response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Проверяем заголовки безопасности
+        headers = {
+            'X-Frame-Options': 'SAMEORIGIN',
+            'X-Content-Type-Options': 'nosniff',
+            'Content-Security-Policy': "default-src 'self'; object-src 'none'",
+            'Referrer-Policy': 'strict-origin-when-cross-origin'
+        }
+        
+        # Проверяем, что все нужные заголовки присутствуют и их значения верные
+        for key, value in headers.items():
+            self.assertEqual(response.headers.get(key), value)
