@@ -236,3 +236,9 @@ class TestAccountService(TestCase):
         # Проверяем, что все нужные заголовки присутствуют и их значения верные
         for key, value in headers.items():
             self.assertEqual(response.headers.get(key), value)
+    def test_cors_security(self):
+        """Он должен возвращать заголовок CORS"""
+        response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Проверьте наличие заголовка CORS
+        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*')
