@@ -1,6 +1,5 @@
 """
 Test cases for Account Model
-
 """
 import logging
 import unittest
@@ -15,7 +14,7 @@ DATABASE_URI = os.getenv(
 
 
 ######################################################################
-#  Account   M O D E L   T E S T   C A S E S
+#  Account   M O D E L   T E S Т   C A S E S
 ######################################################################
 class TestAccount(unittest.TestCase):
     """Test Cases for Account Model"""
@@ -49,7 +48,6 @@ class TestAccount(unittest.TestCase):
     def test_create_an_account(self):
         """It should Create an Account and assert that it exists"""
         fake_account = AccountFactory()
-        # pylint: disable=unexpected-keyword-arg
         account = Account(
             name=fake_account.name,
             email=fake_account.email,
@@ -71,7 +69,6 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(accounts, [])
         account = AccountFactory()
         account.create()
-        # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(account.id)
         accounts = Account.all()
         self.assertEqual(len(accounts), 1)
@@ -81,7 +78,6 @@ class TestAccount(unittest.TestCase):
         account = AccountFactory()
         account.create()
 
-        # Read it back
         found_account = Account.find(account.id)
         self.assertEqual(found_account.id, account.id)
         self.assertEqual(found_account.name, account.name)
@@ -94,16 +90,13 @@ class TestAccount(unittest.TestCase):
         """It should Update an account"""
         account = AccountFactory(email="advent@change.me")
         account.create()
-        # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(account.id)
         self.assertEqual(account.email, "advent@change.me")
 
-        # Fetch it back
         account = Account.find(account.id)
         account.email = "XYZZY@plugh.com"
         account.update()
 
-        # Fetch it back again
         account = Account.find(account.id)
         self.assertEqual(account.email, "XYZZY@plugh.com")
 
@@ -113,7 +106,6 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(accounts, [])
         account = AccountFactory()
         account.create()
-        # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(account.id)
         accounts = Account.all()
         self.assertEqual(len(accounts), 1)
@@ -128,7 +120,6 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(accounts, [])
         for account in AccountFactory.create_batch(5):
             account.create()
-        # Assert that there are not 5 accounts in the database
         accounts = Account.all()
         self.assertEqual(len(accounts), 5)
 
@@ -137,7 +128,6 @@ class TestAccount(unittest.TestCase):
         account = AccountFactory()
         account.create()
 
-        # Fetch it back by name
         same_account = Account.find_by_name(account.name)[0]
         self.assertEqual(same_account.id, account.id)
         self.assertEqual(same_account.name, account.name)
