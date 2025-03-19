@@ -5,6 +5,7 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
+
 import os
 import logging
 from service import talisman
@@ -20,7 +21,7 @@ DATABASE_URI = os.getenv(
 
 BASE_URL = "/accounts"
 
-HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
+HTTPS_ENVIRON = {"wsgi.url_scheme": "https"}
 
 
 ######################################################################
@@ -31,7 +32,7 @@ class TestAccountService(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Запускается один раз перед всеми тестами"""
+        """Runs once before all tests"""
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
@@ -40,7 +41,7 @@ class TestAccountService(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """Runs once before test suite"""
+        """Runs once after test suite"""
 
     def setUp(self):
         """Runs before each test"""
@@ -74,7 +75,7 @@ class TestAccountService(TestCase):
         return accounts
 
     ######################################################################
-    #  A C C O U N T   T E S Т   C A S E S
+    #  A C C O U N T   T E S T   C A S E S
     ######################################################################
 
     def test_index(self):
@@ -95,7 +96,7 @@ class TestAccountService(TestCase):
         response = self.client.post(
             BASE_URL,
             json=account.serialize(),
-            content_type="application/json"
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -118,7 +119,7 @@ class TestAccountService(TestCase):
         response = self.client.post(
             BASE_URL,
             json=account.serialize(),
-            content_type="test/html"
+            content_type="test/html",
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
@@ -142,3 +143,5 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("X-Frame-Options", response.headers)
         self.assertEqual(response.headers["X-Frame-Options"], "SAMEORIGIN")
+
+# Добавлена пустая строка в конце файла
