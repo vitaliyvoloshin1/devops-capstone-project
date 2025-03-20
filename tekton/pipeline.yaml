@@ -64,4 +64,4 @@ spec:
         - name: database_uri
           value: "sqlite:///test.db"
       runAfter:
-        - clone  # ❗ Исправлено: теперь `test` запускается после `clone`, а не `lint`
+        - clone  # ❗ Исправленсо: теперь `test` запускается после `clone`, а не `lint`
