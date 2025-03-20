@@ -2,6 +2,7 @@
 # This pipeline needs the following tasks from Tekton Hub
 #   - git-clone
 #   - flake8
+#   - nose
 #
 ---
 apiVersion: tekton.dev/v1beta1
@@ -49,7 +50,7 @@ spec:
         - name: args
           value: ["--count", "--max-complexity=10", "--max-line-length=127", "--statistics"]
       runAfter:
-        - clone
+        - clone  # ❗ Исправлено: теперь `lint` запускается после `clone`
 
     - name: test
       workspaces:
@@ -63,4 +64,4 @@ spec:
         - name: database_uri
           value: "sqlite:///test.db"
       runAfter:
-        - lint
+        - clone  # ❗ Исправлено: теперь `test` запускается после `clone`, а не `lint`
