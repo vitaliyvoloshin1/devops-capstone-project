@@ -3,6 +3,8 @@
 #   - git-clone
 #   - flake8
 #   - nose
+#   - buildah (ClusterTask)
+#   - openshift-client (ClusterTask)
 #
 ---
 apiVersion: tekton.dev/v1beta1
@@ -16,6 +18,7 @@ spec:
     - name: repo-url
     - name: branch
       default: main
+    - name: build-image
   tasks:
     - name: init
       workspaces:
@@ -50,7 +53,7 @@ spec:
         - name: args
           value: ["--count", "--max-complexity=10", "--max-line-length=127", "--statistics"]
       runAfter:
-        - clone  # ❗ Исправлено: теперь `lint` запускается после `clone`
+        - clone
 
     - name: test
       workspaces:
@@ -64,4 +67,37 @@ spec:
         - name: database_uri
           value: "sqlite:///test.db"
       runAfter:
-        - clone  # ❗ Исправленсо: теперь `test` запускается после `clone`, а не `lint`
+        - clone
+
+    - name: build
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      params:
+        - name: IMAGE
+          value: "$(params.build-image)"
+      runAfter:
+        - lint
+        - test
+
+    - name: deploy
+      workspaces:
+        - name: manifest-dir
+          workspace: pipeline-workspace
+      taskRef:
+        name: openshift-client
+        kind: ClusterTask
+      params:
+        - name: SCRIPT
+          value: |
+            echo "Updating manifest..."
+            sed -i "s|IMAGE_NAME_HERE|$(params.build-image)|g" deploy/deployment.yaml
+            cat deploy/deployment.yaml
+            echo "Deploying to OpenShift..."
+            oc apply -f deploy/
+            oc get pods -l app=accounts
+      runAfter:
+        - build
